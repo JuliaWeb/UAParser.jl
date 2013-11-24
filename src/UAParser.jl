@@ -103,9 +103,36 @@ end
 
 ##############################################################################
 ##
-## FOO
+## Functions for parsing user agent strings
 ##
 ##############################################################################
+
+function getdevice(user_agent_string::String)
+#Look for a matching regex...Once there is a match
+#If there is already a value for device_replacement (string more than zero characters)
+    #Check to see if device_replacement has $1 in it: if it does, substitute the regex matched value for the $1 token
+    #If there isn't a $1 in the value, then just use the device_replacement value directly
+#If there is no value for device_replacement, then just use the regex match directly
+
+  for value in DEVICE_PARSERS
+    if ismatch(value.user_agent_re, user_agent_string)
+      if length(value.device_replacement) > 0
+        if ismatch(r"\$1", value.device_replacement)
+          device = replace(value.device_replacement, r"\$1", match(value.user_agent_re, user_agent_string).captures[1])
+        else 
+          device = value.device_replacement
+        end
+      else 
+        device = match(value.user_agent_re, user_agent_string).captures[1]
+      end
+
+      return {"family" => device}
+        
+    end #Check if regex match
+  end #Loop over DEVICE_PARSER end
+
+return {"family" => "Other"}  #Fail-safe for no match
+end #Function end
 
 
 end # module
