@@ -27,23 +27,23 @@ const REGEXES = YAML.load(open(Pkg.dir("UAParser", "regexes.yaml")));
 immutable UserAgentParser
   pattern::String
   user_agent_re::Regex
-  family_replacement::String
-  v1_replacement::String
-  v2_replacement::String
+  family_replacement::Union(String, Nothing)
+  v1_replacement::Union(String, Nothing)
+  v2_replacement::Union(String, Nothing)
 end
   
 immutable OSParser
   pattern::String
   user_agent_re::Regex
-  os_replacement::String
-  os_v1_replacement::String
-  os_v2_replacement::String
+  os_replacement::Union(String, Nothing)
+  os_v1_replacement::Union(String, Nothing)
+  os_v2_replacement::Union(String, Nothing)
 end
 
 immutable DeviceParser
   pattern::String
   user_agent_re::Regex
-  device_replacement::String
+  device_replacement::Union(String, Nothing)
 end
 
 ##############################################################################
@@ -61,9 +61,9 @@ function loadua()
   for _ua_parser in REGEXES["user_agent_parsers"]
       _pattern = _ua_parser["regex"]
       _user_agent_re = Regex(_pattern)
-      _family_replacement = get(_ua_parser, "family_replacement", "")
-      _v1_replacement = get(_ua_parser, "v1_replacement", "")
-      _v2_replacement = get(_ua_parser, "v2_replacement", "")
+      _family_replacement = get(_ua_parser, "family_replacement", nothing)
+      _v1_replacement = get(_ua_parser, "v1_replacement", nothing)
+      _v2_replacement = get(_ua_parser, "v2_replacement", nothing)
         
     #Add values to array 
       push!(temp, UserAgentParser(_pattern, _user_agent_re, _family_replacement, _v1_replacement, _v2_replacement))
@@ -82,9 +82,9 @@ function loados()
   for _os_parser in REGEXES["os_parsers"]
     _pattern = _os_parser["regex"]
     _user_agent_re = Regex(_pattern)
-    _os_replacement = get(_os_parser, "os_replacement", "")
-    _os_v1_replacement = get(_os_parser, "os_v1_replacement", "")
-    _os_v2_replacement = get(_os_parser, "os_v2_replacement", "")
+    _os_replacement = get(_os_parser, "os_replacement", nothing)
+    _os_v1_replacement = get(_os_parser, "os_v1_replacement", nothing)
+    _os_v2_replacement = get(_os_parser, "os_v2_replacement", nothing)
     
     #Add values to array
     push!(temp, OSParser(_pattern, _user_agent_re, _os_replacement, _os_v1_replacement, _os_v2_replacement))
@@ -103,7 +103,7 @@ function loaddevice()
   for _device_parser in REGEXES["device_parsers"]
       _pattern = _device_parser["regex"]
       _user_agent_re = Regex(_pattern)
-      _device_replacement = get(_device_parser, "device_replacement", "")
+      _device_replacement = get(_device_parser, "device_replacement", nothing)
 
     #Add values to array
       push!(temp, DeviceParser(_pattern, _user_agent_re, _device_replacement))
@@ -122,7 +122,7 @@ const DEVICE_PARSERS = loaddevice()
 function parsedevice(user_agent_string::String)
   for value in DEVICE_PARSERS
     if ismatch(value.user_agent_re, user_agent_string)
-      if length(value.device_replacement) > 0
+      if value.device_replacement != nothing
         if ismatch(r"\$1", value.device_replacement)
           device = replace(value.device_replacement, r"\$1", match(value.user_agent_re, user_agent_string).captures[1])
         else 
@@ -147,7 +147,7 @@ function parseuseragent(user_agent_string::String)
       match_vals = match(value.user_agent_re, user_agent_string).captures
 
       #family
-      if length(value.family_replacement) > 0
+      if value.family_replacement != nothing
         if ismatch(r"\$1", value.family_replacement)
           family = replace(value.family_replacement, r"\$1", match_vals[1])
         else 
@@ -158,28 +158,28 @@ function parseuseragent(user_agent_string::String)
       end
 
       #major
-      if length(value.v1_replacement) > 0
+      if value.v1_replacement != nothing
         v1 = value.v1_replacement
       elseif length(match_vals) > 1
         v1 = match_vals[2]
       else 
-        v1 = ""
+        v1 = nothing
       end
 
       #minor
-      if length(value.v2_replacement) > 0
+      if value.v2_replacement != nothing
         v2 = value.v2_replacement
       elseif length(match_vals) > 2
         v2 = match_vals[3]
       else 
-        v2 = ""
+        v2 = nothing
       end
 
       #patch
       if length(match_vals) > 3
         v3 = match_vals[4]
       else 
-        v3 = ""
+        v3 = nothing
       end
 
       return {"family" => family, 
@@ -190,9 +190,9 @@ function parseuseragent(user_agent_string::String)
     end
   end
 return {"family" => "Other", 
-        "major" => "", 
-        "minor" => "", 
-        "patch" => ""} #fail-safe for no match
+        "major" => nothing, 
+        "minor" => nothing, 
+        "patch" => nothing} #fail-safe for no match
 end #End parseuseragent
 
 function parseos(user_agent_string::String)
@@ -201,42 +201,42 @@ function parseos(user_agent_string::String)
             match_vals = match(value.user_agent_re, user_agent_string).captures
 
             #os
-            if length(value.os_replacement) > 0
+            if value.os_replacement != nothing
                 os = value.os_replacement
             else
                 os = match_vals[1]
             end 
 
             #os_v1
-            if length(value.os_v1_replacement) > 0
+            if value.os_v1_replacement != nothing
                 os_v1 = value.os_v1_replacement
             elseif length(match_vals) > 1
                 os_v1 = match_vals[2]
             else 
-                os_v1 = ""
+                os_v1 = nothing
             end
 
             #os_v2
-            if length(value.os_v2_replacement) > 0
+            if value.os_v2_replacement != nothing
                 os_v2 = value.os_v2_replacement
             elseif length(match_vals) > 2
                 os_v2 = match_vals[3]
             else 
-                os_v2 = ""
+                os_v2 = nothing
             end
 
             #os_v3
             if length(match_vals) > 3
                 os_v3 = match_vals[4]
             else 
-                os_v3 = ""
+                os_v3 = nothing
             end
 
             #os_v4
             if length(match_vals) > 4
                 os_v4 = match_vals[5]
             else 
-                os_v4 = ""
+                os_v4 = nothing
             end
 
             return {"family" => os, 
@@ -249,10 +249,10 @@ function parseos(user_agent_string::String)
     end
 
 return {"family" => "Other", 
-        "major" => "", 
-        "minor" => "", 
-        "patch" => "", 
-        "patch_minor" => ""} #Fail-safe if no match
+        "major" => nothing, 
+        "minor" => nothing, 
+        "patch" => nothing, 
+        "patch_minor" => nothing} #Fail-safe if no match
 end #End parseos 
 
 function parseall(user_agent_string::String)

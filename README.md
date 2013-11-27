@@ -45,7 +45,7 @@ You can index into the results of these functions like any other Julia Dict. Pas
 
 ##Validation testing
 
-Validation of the results provided by UAParser will be evaluated against the [test files](https://github.com/tobie/ua-parser/tree/master/test_resources) provided by the maintainers of the ua-parser library as feasible. Currently, only the the `parsedevice` function passes all test cases; functions `parseos`, `parseuseragent` and `parseall` have been validated against selected examples and will be validated against the full test file suite at a future date.
+Validation of the results provided by UAParser will be evaluated against the [test files](https://github.com/tobie/ua-parser/tree/master/test_resources) provided by the maintainers of the ua-parser library as feasible. Currently, `parsedevice` and `parseos` passes all test cases; `parseuseragent` passes a majority of tests (see Test #4 for failing user-agent strings); the non-matching `parseuseragent` calls are due to currently not replicating the jsParseBits functionality from the reference Python script. This functionality may or may not be implemented in the future, depending on prevalence of these oddities in the wild.
 
 Testing will be eventually built into the Travis build as well.
 
