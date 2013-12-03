@@ -26,21 +26,21 @@ const REGEXES = YAML.load(open(Pkg.dir("UAParser", "regexes.yaml")));
 
 immutable UserAgentParser
   user_agent_re::Regex
-  family_replacement::Union(UTF8String, Nothing)
-  v1_replacement::Union(UTF8String, Nothing)
-  v2_replacement::Union(UTF8String, Nothing)
+  family_replacement::Union(String, Nothing)
+  v1_replacement::Union(String, Nothing)
+  v2_replacement::Union(String, Nothing)
 end
   
 immutable OSParser
   user_agent_re::Regex
-  os_replacement::Union(UTF8String, Nothing)
-  os_v1_replacement::Union(UTF8String, Nothing)
-  os_v2_replacement::Union(UTF8String, Nothing)
+  os_replacement::Union(String, Nothing)
+  os_v1_replacement::Union(String, Nothing)
+  os_v2_replacement::Union(String, Nothing)
 end
 
 immutable DeviceParser
   user_agent_re::Regex
-  device_replacement::Union(UTF8String, Nothing)
+  device_replacement::Union(String, Nothing)
 end
 
 ##############################################################################
