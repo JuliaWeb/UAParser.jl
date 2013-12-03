@@ -25,7 +25,6 @@ const REGEXES = YAML.load(open(Pkg.dir("UAParser", "regexes.yaml")));
 ##############################################################################
 
 immutable UserAgentParser
-  pattern::String
   user_agent_re::Regex
   family_replacement::Union(String, Nothing)
   v1_replacement::Union(String, Nothing)
@@ -33,7 +32,6 @@ immutable UserAgentParser
 end
   
 immutable OSParser
-  pattern::String
   user_agent_re::Regex
   os_replacement::Union(String, Nothing)
   os_v1_replacement::Union(String, Nothing)
@@ -41,7 +39,6 @@ immutable OSParser
 end
 
 immutable DeviceParser
-  pattern::String
   user_agent_re::Regex
   device_replacement::Union(String, Nothing)
 end
@@ -66,7 +63,7 @@ function loadua()
       _v2_replacement = get(_ua_parser, "v2_replacement", nothing)
         
     #Add values to array 
-      push!(temp, UserAgentParser(_pattern, _user_agent_re, _family_replacement, _v1_replacement, _v2_replacement))
+      push!(temp, UserAgentParser(_user_agent_re, _family_replacement, _v1_replacement, _v2_replacement))
     
   end
   return temp
@@ -87,7 +84,7 @@ function loados()
     _os_v2_replacement = get(_os_parser, "os_v2_replacement", nothing)
     
     #Add values to array
-    push!(temp, OSParser(_pattern, _user_agent_re, _os_replacement, _os_v1_replacement, _os_v2_replacement))
+    push!(temp, OSParser(_user_agent_re, _os_replacement, _os_v1_replacement, _os_v2_replacement))
     
   end
   return temp
@@ -106,7 +103,7 @@ function loaddevice()
       _device_replacement = get(_device_parser, "device_replacement", nothing)
 
     #Add values to array
-      push!(temp, DeviceParser(_pattern, _user_agent_re, _device_replacement))
+      push!(temp, DeviceParser(_user_agent_re, _device_replacement))
   end
   return temp
 end #End loaddevice
