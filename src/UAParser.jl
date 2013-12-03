@@ -26,21 +26,21 @@ const REGEXES = YAML.load(open(Pkg.dir("UAParser", "regexes.yaml")));
 
 immutable UserAgentParser
   user_agent_re::Regex
-  family_replacement::Union(String, Nothing)
-  v1_replacement::Union(String, Nothing)
-  v2_replacement::Union(String, Nothing)
+  family_replacement::Union(UTF8String, Nothing)
+  v1_replacement::Union(UTF8String, Nothing)
+  v2_replacement::Union(UTF8String, Nothing)
 end
   
 immutable OSParser
   user_agent_re::Regex
-  os_replacement::Union(String, Nothing)
-  os_v1_replacement::Union(String, Nothing)
-  os_v2_replacement::Union(String, Nothing)
+  os_replacement::Union(UTF8String, Nothing)
+  os_v1_replacement::Union(UTF8String, Nothing)
+  os_v2_replacement::Union(UTF8String, Nothing)
 end
 
 immutable DeviceParser
   user_agent_re::Regex
-  device_replacement::Union(String, Nothing)
+  device_replacement::Union(UTF8String, Nothing)
 end
 
 ##############################################################################
@@ -116,7 +116,7 @@ const DEVICE_PARSERS = loaddevice()
 ##
 ##############################################################################
 
-function parsedevice(user_agent_string::String)
+function parsedevice(user_agent_string::UTF8String)
   for value in DEVICE_PARSERS
     if ismatch(value.user_agent_re, user_agent_string)
       if value.device_replacement != nothing
@@ -137,7 +137,7 @@ function parsedevice(user_agent_string::String)
 return {"family" => "Other"}  #Fail-safe for no match
 end #End parsedevice
 
-function parseuseragent(user_agent_string::String)
+function parseuseragent(user_agent_string::UTF8String)
   for value in USER_AGENT_PARSERS
     if ismatch(value.user_agent_re, user_agent_string)
 
@@ -192,7 +192,7 @@ return {"family" => "Other",
         "patch" => nothing} #fail-safe for no match
 end #End parseuseragent
 
-function parseos(user_agent_string::String)
+function parseos(user_agent_string::UTF8String)
     for value in OS_PARSERS
         if ismatch(value.user_agent_re, user_agent_string)
             match_vals = match(value.user_agent_re, user_agent_string).captures
