@@ -124,7 +124,7 @@ function parsedevice(user_agent_string::String)
     if ismatch(value.user_agent_re, user_agent_string)
       if value.device_replacement != nothing
         if ismatch(r"\$1", value.device_replacement)
-          device = replace(value.device_replacement, r"\$1", match(value.user_agent_re, user_agent_string).captures[1])
+          device = replace(value.device_replacement, "\$1", match(value.user_agent_re, user_agent_string).captures[1])
         else 
           device = value.device_replacement
         end
@@ -149,7 +149,7 @@ function parseuseragent(user_agent_string::String)
       #family
       if value.family_replacement != nothing
         if ismatch(r"\$1", value.family_replacement)
-          family = replace(value.family_replacement, r"\$1", match_vals[1])
+          family = replace(value.family_replacement, "\$1", match_vals[1])
         else 
           family = value.family_replacement
         end 
