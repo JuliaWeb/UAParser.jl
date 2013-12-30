@@ -7,9 +7,20 @@ UAParser is a Julia port of ua-parser(https://github.com/tobie/ua-parser), which
 
 UAParser is a limited Julia implementation heavily influenced by the [Python code](https://github.com/tobie/ua-parser/tree/master/py) from the ua-parser library.
 
-##Code examples
+##UAParser API
 
-The API for UAParser revolves around three main functions: `parsedevice`, `parseos` and `parseuseragent`, with a fourth function `parseall` which is just a convenience function that runs the other three functions for a given user-agent string. The function names and return values are modeled after the Python version of the ua-parser project. Each function takes one argument, `user_agent_string::String` and returns a Dict.
+The API for UAParser revolves around three main functions: `parsedevice`, `parseos` and `parseuseragent`. Each function takes one argument, `user_agent_string::String` and returns a custom Julia type: DeviceResult, OSResult, or UAResult. The structure of each type is as follows:
+
+```julia
+  DeviceResult: family
+
+  UAResult: family, major, minor, patch
+
+  OSResult: family, major, minor, patch, patch_minor
+
+```
+
+##Code examples
 
 ```julia
   using UAParser
@@ -18,30 +29,30 @@ The API for UAParser revolves around three main functions: `parsedevice`, `parse
   user_agent_string = "Mozilla/5.0 (iPhone; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B179 Safari/7534.48.3"
   
   #Get device from user-agent string
-  parsedevice(user_agent_string) #=> {"family"=>"iPhone"}
+  parsedevice(user_agent_string) #=> DeviceResult("iPhone")
   
   #Get browser information from user-agent string
-  parseuseragent(user_agent_string) #=> {"major"=>"5","minor"=>"1","patch"=>"","family"=>"Mobile Safari"}
+  parseuseragent(user_agent_string) #=> UAResult("Mobile Safari","5","1",nothing)
   
   #Get os information
-  parseos(user_agent_string) #=> {"major"=>"5","minor"=>"1","patch"=>nothing,"patch_minor"=>"","family"=>"iOS"}
+  parseos(user_agent_string) #=> OSResult("iOS","5","1",nothing,nothing)
   
-  #Get all information
-  parseall(user_agent_string) #=> {"user_agent"=>{"major"=>"5","minor"=>"1","patch"=>"","family"=>"Mobile Safari"},"string"=>"Mozilla/5.0 (iPhone; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B179 Safari/7534.48.3","os"=>{"major"=>"5","minor"=>"1","patch"=>nothing,"patch_minor"=>"","family"=>"iOS"},"device"=>{"family"=>"iPhone"}}
 ```
 
-You can index into the results of these functions like any other Julia Dict. Pass an individual key to get the value.
+You can index into the results of these functions like any other Julia composite type.
 
 ```julia
   #Get just browser information, no version information
   x1 = parseuseragent(user_agent_string)
-  x1["family"] #=> "Mobile Safari"
+  x1.family #=> "Mobile Safari"
   
   #Get the os, no version information
   x2 = parseos(user_agent_string)
-  x2["family"] #=> "iOS"
+  x2.family #=> "iOS"
 
 ```
+
+Additionally, each function is vectorized using `Base.@vectorize_1arg`, so passing an array of user-agent strings will return an array.
 
 ##Validation testing
 

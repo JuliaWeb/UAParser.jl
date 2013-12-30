@@ -1,6 +1,6 @@
 module UAParser
 
-export parsedevice, parseuseragent, parseos, parseall
+export parsedevice, parseuseragent, parseos
 
 ##############################################################################
 ##
@@ -25,7 +25,6 @@ const REGEXES = YAML.load(open(Pkg.dir("UAParser", "regexes.yaml")));
 ##############################################################################
 
 immutable UserAgentParser
-  pattern::String
   user_agent_re::Regex
   family_replacement::Union(String, Nothing)
   v1_replacement::Union(String, Nothing)
@@ -33,7 +32,6 @@ immutable UserAgentParser
 end
   
 immutable OSParser
-  pattern::String
   user_agent_re::Regex
   os_replacement::Union(String, Nothing)
   os_v1_replacement::Union(String, Nothing)
@@ -41,9 +39,33 @@ immutable OSParser
 end
 
 immutable DeviceParser
-  pattern::String
   user_agent_re::Regex
   device_replacement::Union(String, Nothing)
+end
+
+##############################################################################
+##
+## Create custom types to hold function results
+##
+##############################################################################
+
+immutable DeviceResult
+  family::UTF8String  
+end
+
+immutable UAResult
+  family::String
+  major::Union(String, Nothing)
+  minor::Union(String, Nothing)
+  patch::Union(String, Nothing)
+end
+
+immutable OSResult
+  family::String
+  major::Union(String, Nothing)
+  minor::Union(String, Nothing)
+  patch::Union(String, Nothing)
+  patch_minor::Union(String, Nothing)
 end
 
 ##############################################################################
@@ -52,21 +74,23 @@ end
 ##
 ##############################################################################
 
-
 function loadua()
   #Create empty array to hold user-agent information
   temp = {}
 
   #Loop over entire set of user_agent_parsers, add to USER_AGENT_PARSERS
   for _ua_parser in REGEXES["user_agent_parsers"]
-      _pattern = _ua_parser["regex"]
-      _user_agent_re = Regex(_pattern)
+      _user_agent_re = Regex(_ua_parser["regex"])
       _family_replacement = get(_ua_parser, "family_replacement", nothing)
       _v1_replacement = get(_ua_parser, "v1_replacement", nothing)
       _v2_replacement = get(_ua_parser, "v2_replacement", nothing)
         
     #Add values to array 
-      push!(temp, UserAgentParser(_pattern, _user_agent_re, _family_replacement, _v1_replacement, _v2_replacement))
+      push!(temp, UserAgentParser(_user_agent_re,
+                                  _family_replacement,
+                                  _v1_replacement,
+                                  _v2_replacement
+                                  ))
     
   end
   return temp
@@ -80,14 +104,17 @@ function loados()
 
   #Loop over entire set of os_parsers, add to OS_PARSERS
   for _os_parser in REGEXES["os_parsers"]
-    _pattern = _os_parser["regex"]
-    _user_agent_re = Regex(_pattern)
+    _user_agent_re = Regex(_os_parser["regex"])
     _os_replacement = get(_os_parser, "os_replacement", nothing)
     _os_v1_replacement = get(_os_parser, "os_v1_replacement", nothing)
     _os_v2_replacement = get(_os_parser, "os_v2_replacement", nothing)
     
     #Add values to array
-    push!(temp, OSParser(_pattern, _user_agent_re, _os_replacement, _os_v1_replacement, _os_v2_replacement))
+    push!(temp, OSParser(_user_agent_re,
+                         _os_replacement,
+                         _os_v1_replacement,
+                         _os_v2_replacement
+                         ))
     
   end
   return temp
@@ -101,12 +128,11 @@ function loaddevice()
 
   #Loop over entire set of device_parsers, add to DEVICE_PARSERS
   for _device_parser in REGEXES["device_parsers"]
-      _pattern = _device_parser["regex"]
-      _user_agent_re = Regex(_pattern)
+      _user_agent_re = Regex(_device_parser["regex"])
       _device_replacement = get(_device_parser, "device_replacement", nothing)
 
     #Add values to array
-      push!(temp, DeviceParser(_pattern, _user_agent_re, _device_replacement))
+      push!(temp, DeviceParser(_user_agent_re, _device_replacement))
   end
   return temp
 end #End loaddevice
@@ -132,13 +158,16 @@ function parsedevice(user_agent_string::String)
         device = match(value.user_agent_re, user_agent_string).captures[1]
       end
 
-      return {"family" => device}
+      return DeviceResult(device)
         
     end
   end
 
-return {"family" => "Other"}  #Fail-safe for no match
+return DeviceResult("Other")  #Fail-safe for no match
 end #End parsedevice
+
+#Vectorize parsedevice for any array of user-agent strings
+Base.@vectorize_1arg String parsedevice
 
 function parseuseragent(user_agent_string::String)
   for value in USER_AGENT_PARSERS
@@ -182,18 +211,16 @@ function parseuseragent(user_agent_string::String)
         v3 = nothing
       end
 
-      return {"family" => family, 
-              "major" => v1, 
-              "minor" => v2, 
-              "patch" => v3}
-      
+      return UAResult(family, v1, v2, v3)
+
     end
   end
-return {"family" => "Other", 
-        "major" => nothing, 
-        "minor" => nothing, 
-        "patch" => nothing} #fail-safe for no match
+
+return UAResult("Other", nothing, nothing, nothing) #Fail-safe for no match
 end #End parseuseragent
+
+#Vectorize parseuseragent for any array of user-agent strings
+Base.@vectorize_1arg String parseuseragent
 
 function parseos(user_agent_string::String)
     for value in OS_PARSERS
@@ -239,28 +266,15 @@ function parseos(user_agent_string::String)
                 os_v4 = nothing
             end
 
-            return {"family" => os, 
-                    "major" => os_v1, 
-                    "minor" => os_v2, 
-                    "patch" => os_v3, 
-                    "patch_minor" => os_v4}
+            return OSResult(os, os_v1, os_v2, os_v3, os_v4)
 
         end
     end
 
-return {"family" => "Other", 
-        "major" => nothing, 
-        "minor" => nothing, 
-        "patch" => nothing, 
-        "patch_minor" => nothing} #Fail-safe if no match
+return OSResult("Other", nothing, nothing, nothing, nothing) #Fail-safe if no match
 end #End parseos 
 
-function parseall(user_agent_string::String)
-
-  return {"user_agent" => parseuseragent(user_agent_string),
-          "os" => parseos(user_agent_string),
-          "device" => parsedevice(user_agent_string),
-          "string" => user_agent_string}
-end #End parseall
+#Vectorize parseos for any array of user-agent strings
+Base.@vectorize_1arg String parseos
 
 end # module
