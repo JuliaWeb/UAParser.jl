@@ -1,6 +1,7 @@
 module UAParser
 
-export parsedevice, parseuseragent, parseos
+export parsedevice, parseuseragent, parseos, DeviceResult, OSResult, UAResult, DataFrame
+
 
 ##############################################################################
 ##
@@ -8,7 +9,8 @@ export parsedevice, parseuseragent, parseos
 ##
 ##############################################################################
 
-using YAML
+using YAML, DataFrames
+import DataFrames.DataFrame, DataFrames.colnames!
 
 ##############################################################################
 ##
@@ -158,8 +160,7 @@ function parsedevice(user_agent_string::String)
         device = match(value.user_agent_re, user_agent_string).captures[1]
       end
 
-      return DeviceResult(device)
-        
+        return DeviceResult(device)
     end
   end
 
@@ -276,5 +277,73 @@ end #End parseos
 
 #Vectorize parseos for any array of user-agent strings
 Base.@vectorize_1arg String parseos
+
+##############################################################################
+##
+## Extend DataFrames to include UAParser methods 
+##
+##############################################################################
+
+#Convenience function to take nothing type to UTF8String of length 0
+#This is a hack for sure
+function nothing_to_utf8empty(x::Union(String, Nothing))
+  if x == nothing
+    x = ""
+  else
+    x = convert(UTF8String, x)
+  end
+end
+
+#DeviceResult to DataFrame method
+function DataFrame(x::Array{DeviceResult, 1})
+  temp = DataFrame([element.family for element in x])
+  colnames!(temp, ["device"])
+  return temp
+end
+
+#OSResult to DataFrame method
+function DataFrame(x::Array{OSResult, 1})
+  #Pre-allocate size of DataFrame based on array passed in
+  temp = DataFrame(UTF8String, size(x, 1), 5)
+  colnames!(temp, ["os_family", "os_major", "os_minor", "os_patch", "os_patch_minor"])
+
+  #Family - Can use comprehension since family always UTF8String
+  temp["os_family"] = UTF8String[element.family for element in x]
+
+  #Major
+  temp["os_major"] = UTF8String[nothing_to_utf8empty(element.major) for element in x]
+
+  #Minor
+  temp["os_minor"] = UTF8String[nothing_to_utf8empty(element.minor) for element in x]
+
+  #Patch
+  temp["os_patch"] = UTF8String[nothing_to_utf8empty(element.patch) for element in x]
+
+  #Patch_Minor
+  temp["os_patch_minor"] = UTF8String[nothing_to_utf8empty(element.patch_minor) for element in x]
+
+  return temp  
+end
+
+#UAResult to DataFrame method
+function DataFrame(x::Array{UAResult, 1})
+  #Pre-allocate size of DataFrame based on array passed in
+  temp = DataFrame(UTF8String, size(x, 1), 4)
+  colnames!(temp, ["browser_family", "browser_major", "browser_minor", "browser_patch"])
+
+  #Family - Can use comprehension since family always UTF8String
+  temp["browser_family"] = UTF8String[element.family for element in x]
+
+  #Major
+  temp["browser_major"] = UTF8String[nothing_to_utf8empty(element.major) for element in x]
+
+  #Minor
+  temp["browser_minor"] = UTF8String[nothing_to_utf8empty(element.minor) for element in x]
+
+  #Patch
+  temp["browser_patch"] = UTF8String[nothing_to_utf8empty(element.patch) for element in x]
+
+  return temp  
+end
 
 end # module
