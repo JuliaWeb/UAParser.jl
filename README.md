@@ -52,7 +52,7 @@ You can index into the results of these functions like any other Julia composite
 
 ```
 
-Additionally, each function is vectorized using `Base.@vectorize_1arg`, so passing an array of user-agent strings will return an array.
+Each function is vectorized using `Base.@vectorize_1arg`, so passing an array of user-agent strings will return an array. Finally, DataFrame methods have been defined for arrays of each UAParser type, so calling `DataFrame(DeviceResult)` will transform the array to a DataFrame.
 
 ##Validation testing
 
