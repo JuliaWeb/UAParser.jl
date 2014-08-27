@@ -1,9 +1,12 @@
-#UAParser [![Build Status](https://secure.travis-ci.org/randyzwitch/UAParser.jl.png?branch=master)](https://travis-ci.org/randyzwitch/UAParser.jl)
+# UAParser 
 
-UAParser is a Julia port of ua-parser(https://github.com/tobie/ua-parser), which itself is a multi-language port of [BrowserScope's](http://www.browserscope.org) [user agent string parser](http://code.google.com/p/ua-parser/). Per the [README file](https://github.com/tobie/ua-parser/blob/master/README.markdown) from that project:
+[![Build Status](https://secure.travis-ci.org/JuliaWeb/UAParser.jl.png?branch=master)](https://travis-ci.org/JuliaWeb/UAParser.jl)
+[![Coverage Status](https://img.shields.io/JuliaWeb/UAParser.jl.svg)](https://coveralls.io/r/JuliaWeb/UAParser.jl?branch=master)
 
 
-"The crux of the original parser--the data collected by [Steve Souders](http://stevesouders.com/) over the years--has been extracted into a separate [YAML file](https://github.com/tobie/ua-parser/blob/master/regexes.yaml) so as to be reusable _as is_ by implementations in other programming languages."
+UAParser is a Julia port of [ua-parser](https://github.com/tobie/ua-parser), which itself is a multi-language port of [BrowserScope's](http://www.browserscope.org) [user agent string parser](http://code.google.com/p/ua-parser/). Per the [README file](https://github.com/tobie/ua-parser/blob/master/README.markdown) from that project:
+
+    "The crux of the original parser--the data collected by [Steve Souders](http://stevesouders.com/) over the years--has been extracted into a separate [YAML file](https://github.com/tobie/ua-parser/blob/master/regexes.yaml) so as to be reusable _as is_ by implementations in other programming languages."
 
 UAParser is a limited Julia implementation heavily influenced by the [Python code](https://github.com/tobie/ua-parser/tree/master/py) from the ua-parser library.
 

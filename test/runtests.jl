@@ -15,6 +15,7 @@ for test_case in test_device["test_cases"]
     println("PASS")
   else
     println("FAIL: ", "User Agent: ", test_case["user_agent_string"])
+    error("")
   end
 end
 
@@ -35,6 +36,7 @@ for value in test_os["test_cases"]
       println("PASS")
   else
       println("FAIL: ", value["user_agent_string"])
+      error("")
   end
 end
 
@@ -51,6 +53,7 @@ for value in test_os_2["test_cases"]
       println("PASS")
   else
       println("FAIL: ", value["user_agent_string"])
+      error("")
   end
 end
 
@@ -66,6 +69,7 @@ for value in test_ua["test_cases"]
     println("PASS")
   else
     println("FAIL: ", value["user_agent_string"])
+    error("")
   end
 end
 
@@ -81,5 +85,6 @@ for value in test_ua_2["test_cases"]
     println("PASS")
   else
     println("FAIL: ", value["user_agent_string"])
+    error("")
   end
 end
