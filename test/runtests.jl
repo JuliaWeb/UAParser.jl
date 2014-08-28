@@ -4,6 +4,8 @@ using UAParser, YAML
 
 #Tests look a little funky, because YAML reads in file as Dict
 #UAParser uses composite type; tests build Dict for comparison
+#Test files where tests are commented out due to not implementing jsParseBits from ua-parser Python library
+#These user-agents look to be older, may not still be out in wild
 
 
 #Test 1: Validation of parsedevice
