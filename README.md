@@ -1,7 +1,8 @@
 # UAParser 
 
-[![Build Status](https://secure.travis-ci.org/JuliaWeb/UAParser.jl.png?branch=master)](https://travis-ci.org/JuliaWeb/UAParser.jl)
-[![Coverage Status](https://img.shields.io/JuliaWeb/UAParser.jl.svg)](https://coveralls.io/r/JuliaWeb/UAParser.jl?branch=master)
+[![Build Status](https://travis-ci.org/JuliaWeb/UAParser.jl.svg?branch=master)](https://travis-ci.org/JuliaWeb/UAParser.jl)
+[![Coverage Status](https://coveralls.io/repos/JuliaWeb/UAParser.jl/badge.svg)](https://coveralls.io/r/JuliaWeb/UAParser.jl)
+[![UAParser](http://pkg.julialang.org/badges/UAParser_release.svg)](http://pkg.julialang.org/?pkg=UAParser&ver=release)
 
 UAParser is a Julia port of [ua-parser](https://github.com/tobie/ua-parser), which itself is a multi-language port of [BrowserScope's](http://www.browserscope.org) [user agent string parser](http://code.google.com/p/ua-parser/). Per the [README file](https://github.com/tobie/ua-parser/blob/master/README.markdown) from that project:
 
