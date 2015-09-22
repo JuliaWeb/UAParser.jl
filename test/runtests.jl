@@ -25,16 +25,16 @@ end
 test_os = YAML.load(open(Pkg.dir("UAParser", "test", "data", "test_user_agent_parser_os.yaml")));
 
 for value in test_os["test_cases"]
-  if {"major" => value["major"], 
-      "minor" => value["minor"], 
-      "patch" => value["patch"], 
-      "patch_minor" => value["patch_minor"], 
-      "family" => value["family"]} == 
-      {"major" => parseos(value["user_agent_string"]).major,
+  if Dict{Any, Any}("major" => value["major"],
+      "minor" => value["minor"],
+      "patch" => value["patch"],
+      "patch_minor" => value["patch_minor"],
+      "family" => value["family"]) ==
+      Dict{Any, Any}("major" => parseos(value["user_agent_string"]).major,
        "minor" => parseos(value["user_agent_string"]).minor,
        "patch" => parseos(value["user_agent_string"]).patch,
        "patch_minor" => parseos(value["user_agent_string"]).patch_minor,
-       "family" => parseos(value["user_agent_string"]).family}
+       "family" => parseos(value["user_agent_string"]).family)
       println("PASS")
   else
       println("FAIL: ", value["user_agent_string"])
@@ -46,12 +46,12 @@ end
 test_os_2 = YAML.load(open(Pkg.dir("UAParser", "test", "data", "additional_os_tests.yaml")));
 
 for value in test_os_2["test_cases"]
-  if {"major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "patch_minor" => value["patch_minor"], "family" => value["family"]} == 
-     {"major" => parseos(value["user_agent_string"]).major,
+  if Dict{Any, Any}("major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "patch_minor" => value["patch_minor"], "family" => value["family"]) ==
+     Dict{Any, Any}("major" => parseos(value["user_agent_string"]).major,
        "minor" => parseos(value["user_agent_string"]).minor,
        "patch" => parseos(value["user_agent_string"]).patch,
        "patch_minor" => parseos(value["user_agent_string"]).patch_minor,
-       "family" => parseos(value["user_agent_string"]).family}
+       "family" => parseos(value["user_agent_string"]).family)
       println("PASS")
   else
       println("FAIL: ", value["user_agent_string"])
@@ -63,11 +63,11 @@ end
 test_ua = YAML.load(open(Pkg.dir("UAParser", "test", "data", "test_user_agent_parser.yaml")));
 
 for value in test_ua["test_cases"]
-  if {"major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "family" => value["family"]} == 
-    {"major" => parseuseragent(value["user_agent_string"]).major,
+  if Dict{Any, Any}("major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "family" => value["family"]) ==
+    Dict{Any, Any}("major" => parseuseragent(value["user_agent_string"]).major,
      "minor" => parseuseragent(value["user_agent_string"]).minor,
      "patch" => parseuseragent(value["user_agent_string"]).patch,
-     "family" => parseuseragent(value["user_agent_string"]).family}
+     "family" => parseuseragent(value["user_agent_string"]).family)
     println("PASS")
   else
     println("FAIL: ", value["user_agent_string"])
@@ -79,11 +79,11 @@ end
 test_ua_2 = YAML.load(open(Pkg.dir("UAParser", "test", "data", "firefox_user_agent_strings.yaml")));
 
 for value in test_ua_2["test_cases"]
-  if {"major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "family" => value["family"]} == 
-     {"major" => parseuseragent(value["user_agent_string"]).major,
+  if Dict{Any, Any}("major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "family" => value["family"]) ==
+     Dict{Any, Any}("major" => parseuseragent(value["user_agent_string"]).major,
      "minor" => parseuseragent(value["user_agent_string"]).minor,
      "patch" => parseuseragent(value["user_agent_string"]).patch,
-     "family" => parseuseragent(value["user_agent_string"]).family}
+     "family" => parseuseragent(value["user_agent_string"]).family)
     println("PASS")
   else
     println("FAIL: ", value["user_agent_string"])

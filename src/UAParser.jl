@@ -1,3 +1,4 @@
+VERSION >= v"0.4-" && __precompile__()
 module UAParser
 
 export parsedevice, parseuseragent, parseos, DeviceResult, OSResult, UAResult, DataFrame
@@ -10,7 +11,7 @@ export parsedevice, parseuseragent, parseos, DeviceResult, OSResult, UAResult, D
 ##############################################################################
 
 using YAML, DataFrames
-import DataFrames.DataFrame, DataFrames.colnames!
+import DataFrames.DataFrame, DataFrames.names!
 
 ##############################################################################
 ##
@@ -28,21 +29,21 @@ const REGEXES = YAML.load(open(Pkg.dir("UAParser", "regexes.yaml")));
 
 immutable UserAgentParser
   user_agent_re::Regex
-  family_replacement::Union(String, Nothing)
-  v1_replacement::Union(String, Nothing)
-  v2_replacement::Union(String, Nothing)
+  family_replacement::Union{AbstractString, Void}
+  v1_replacement::Union{AbstractString, Void}
+  v2_replacement::Union{AbstractString, Void}
 end
-  
+
 immutable OSParser
   user_agent_re::Regex
-  os_replacement::Union(String, Nothing)
-  os_v1_replacement::Union(String, Nothing)
-  os_v2_replacement::Union(String, Nothing)
+  os_replacement::Union{AbstractString, Void}
+  os_v1_replacement::Union{AbstractString, Void}
+  os_v2_replacement::Union{AbstractString, Void}
 end
 
 immutable DeviceParser
   user_agent_re::Regex
-  device_replacement::Union(String, Nothing)
+  device_replacement::Union{AbstractString, Void}
 end
 
 ##############################################################################
@@ -52,22 +53,22 @@ end
 ##############################################################################
 
 immutable DeviceResult
-  family::UTF8String  
+  family::UTF8String
 end
 
 immutable UAResult
-  family::String
-  major::Union(String, Nothing)
-  minor::Union(String, Nothing)
-  patch::Union(String, Nothing)
+  family::AbstractString
+  major::Union{AbstractString, Void}
+  minor::Union{AbstractString, Void}
+  patch::Union{AbstractString, Void}
 end
 
 immutable OSResult
-  family::String
-  major::Union(String, Nothing)
-  minor::Union(String, Nothing)
-  patch::Union(String, Nothing)
-  patch_minor::Union(String, Nothing)
+  family::AbstractString
+  major::Union{AbstractString, Void}
+  minor::Union{AbstractString, Void}
+  patch::Union{AbstractString, Void}
+  patch_minor::Union{AbstractString, Void}
 end
 
 ##############################################################################
@@ -78,7 +79,7 @@ end
 
 function loadua()
   #Create empty array to hold user-agent information
-  temp = {}
+  temp = []
 
   #Loop over entire set of user_agent_parsers, add to USER_AGENT_PARSERS
   for _ua_parser in REGEXES["user_agent_parsers"]
@@ -86,14 +87,14 @@ function loadua()
       _family_replacement = get(_ua_parser, "family_replacement", nothing)
       _v1_replacement = get(_ua_parser, "v1_replacement", nothing)
       _v2_replacement = get(_ua_parser, "v2_replacement", nothing)
-        
-    #Add values to array 
+
+    #Add values to array
       push!(temp, UserAgentParser(_user_agent_re,
                                   _family_replacement,
                                   _v1_replacement,
                                   _v2_replacement
                                   ))
-    
+
   end
   return temp
 end #End loadua
@@ -102,7 +103,7 @@ const USER_AGENT_PARSERS = loadua()
 
 function loados()
   #Create empty array to hold os information
-  temp = {}
+  temp = []
 
   #Loop over entire set of os_parsers, add to OS_PARSERS
   for _os_parser in REGEXES["os_parsers"]
@@ -110,14 +111,14 @@ function loados()
     _os_replacement = get(_os_parser, "os_replacement", nothing)
     _os_v1_replacement = get(_os_parser, "os_v1_replacement", nothing)
     _os_v2_replacement = get(_os_parser, "os_v2_replacement", nothing)
-    
+
     #Add values to array
     push!(temp, OSParser(_user_agent_re,
                          _os_replacement,
                          _os_v1_replacement,
                          _os_v2_replacement
                          ))
-    
+
   end
   return temp
 end #End loados
@@ -126,7 +127,7 @@ const OS_PARSERS = loados()
 
 function loaddevice()
   #Create empty array to hold device information
-  temp = {}
+  temp = []
 
   #Loop over entire set of device_parsers, add to DEVICE_PARSERS
   for _device_parser in REGEXES["device_parsers"]
@@ -147,16 +148,16 @@ const DEVICE_PARSERS = loaddevice()
 ##
 ##############################################################################
 
-function parsedevice(user_agent_string::String)
+function parsedevice(user_agent_string::AbstractString)
   for value in DEVICE_PARSERS
     if ismatch(value.user_agent_re, user_agent_string)
       if value.device_replacement != nothing
         if ismatch(r"\$1", value.device_replacement)
           device = replace(value.device_replacement, "\$1", match(value.user_agent_re, user_agent_string).captures[1])
-        else 
+        else
           device = value.device_replacement
         end
-      else 
+      else
         device = match(value.user_agent_re, user_agent_string).captures[1]
       end
 
@@ -168,9 +169,9 @@ return DeviceResult("Other")  #Fail-safe for no match
 end #End parsedevice
 
 #Vectorize parsedevice for any array of user-agent strings
-Base.@vectorize_1arg String parsedevice
+Base.@vectorize_1arg AbstractString parsedevice
 
-function parseuseragent(user_agent_string::String)
+function parseuseragent(user_agent_string::AbstractString)
   for value in USER_AGENT_PARSERS
     if ismatch(value.user_agent_re, user_agent_string)
 
@@ -180,10 +181,10 @@ function parseuseragent(user_agent_string::String)
       if value.family_replacement != nothing
         if ismatch(r"\$1", value.family_replacement)
           family = replace(value.family_replacement, "\$1", match_vals[1])
-        else 
+        else
           family = value.family_replacement
-        end 
-      else 
+        end
+      else
         family = match_vals[1]
       end
 
@@ -192,7 +193,7 @@ function parseuseragent(user_agent_string::String)
         v1 = value.v1_replacement
       elseif length(match_vals) > 1
         v1 = match_vals[2]
-      else 
+      else
         v1 = nothing
       end
 
@@ -201,14 +202,14 @@ function parseuseragent(user_agent_string::String)
         v2 = value.v2_replacement
       elseif length(match_vals) > 2
         v2 = match_vals[3]
-      else 
+      else
         v2 = nothing
       end
 
       #patch
       if length(match_vals) > 3
         v3 = match_vals[4]
-      else 
+      else
         v3 = nothing
       end
 
@@ -221,9 +222,9 @@ return UAResult("Other", nothing, nothing, nothing) #Fail-safe for no match
 end #End parseuseragent
 
 #Vectorize parseuseragent for any array of user-agent strings
-Base.@vectorize_1arg String parseuseragent
+Base.@vectorize_1arg AbstractString parseuseragent
 
-function parseos(user_agent_string::String)
+function parseos(user_agent_string::AbstractString)
     for value in OS_PARSERS
         if ismatch(value.user_agent_re, user_agent_string)
             match_vals = match(value.user_agent_re, user_agent_string).captures
@@ -233,14 +234,14 @@ function parseos(user_agent_string::String)
                 os = value.os_replacement
             else
                 os = match_vals[1]
-            end 
+            end
 
             #os_v1
             if value.os_v1_replacement != nothing
                 os_v1 = value.os_v1_replacement
             elseif length(match_vals) > 1
                 os_v1 = match_vals[2]
-            else 
+            else
                 os_v1 = nothing
             end
 
@@ -249,21 +250,21 @@ function parseos(user_agent_string::String)
                 os_v2 = value.os_v2_replacement
             elseif length(match_vals) > 2
                 os_v2 = match_vals[3]
-            else 
+            else
                 os_v2 = nothing
             end
 
             #os_v3
             if length(match_vals) > 3
                 os_v3 = match_vals[4]
-            else 
+            else
                 os_v3 = nothing
             end
 
             #os_v4
             if length(match_vals) > 4
                 os_v4 = match_vals[5]
-            else 
+            else
                 os_v4 = nothing
             end
 
@@ -273,20 +274,20 @@ function parseos(user_agent_string::String)
     end
 
 return OSResult("Other", nothing, nothing, nothing, nothing) #Fail-safe if no match
-end #End parseos 
+end #End parseos
 
 #Vectorize parseos for any array of user-agent strings
-Base.@vectorize_1arg String parseos
+Base.@vectorize_1arg AbstractString parseos
 
 ##############################################################################
 ##
-## Extend DataFrames to include UAParser methods 
+## Extend DataFrames to include UAParser methods
 ##
 ##############################################################################
 
 #Convenience function to take nothing type to UTF8String of length 0
 #This is a hack for sure
-function nothing_to_utf8empty(x::Union(String, Nothing))
+function nothing_to_utf8empty(x::Union{AbstractString, Void})
   if x == nothing
     x = ""
   else
@@ -297,7 +298,7 @@ end
 #DeviceResult to DataFrame method
 function DataFrame(x::Array{DeviceResult, 1})
   temp = DataFrame([element.family for element in x])
-  colnames!(temp, ["device"])
+  names!(temp, ["device"])
   return temp
 end
 
@@ -305,7 +306,7 @@ end
 function DataFrame(x::Array{OSResult, 1})
   #Pre-allocate size of DataFrame based on array passed in
   temp = DataFrame(UTF8String, size(x, 1), 5)
-  colnames!(temp, ["os_family", "os_major", "os_minor", "os_patch", "os_patch_minor"])
+  names!(temp, ["os_family", "os_major", "os_minor", "os_patch", "os_patch_minor"])
 
   #Family - Can use comprehension since family always UTF8String
   temp["os_family"] = UTF8String[element.family for element in x]
@@ -322,14 +323,14 @@ function DataFrame(x::Array{OSResult, 1})
   #Patch_Minor
   temp["os_patch_minor"] = UTF8String[nothing_to_utf8empty(element.patch_minor) for element in x]
 
-  return temp  
+  return temp
 end
 
 #UAResult to DataFrame method
 function DataFrame(x::Array{UAResult, 1})
   #Pre-allocate size of DataFrame based on array passed in
   temp = DataFrame(UTF8String, size(x, 1), 4)
-  colnames!(temp, ["browser_family", "browser_major", "browser_minor", "browser_patch"])
+  names!(temp, ["browser_family", "browser_major", "browser_minor", "browser_patch"])
 
   #Family - Can use comprehension since family always UTF8String
   temp["browser_family"] = UTF8String[element.family for element in x]
@@ -343,7 +344,7 @@ function DataFrame(x::Array{UAResult, 1})
   #Patch
   temp["browser_patch"] = UTF8String[nothing_to_utf8empty(element.patch) for element in x]
 
-  return temp  
+  return temp
 end
 
 end # module
