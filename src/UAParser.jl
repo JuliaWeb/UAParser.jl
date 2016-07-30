@@ -19,7 +19,7 @@ import DataFrames.DataFrame, DataFrames.names!
 ##
 ##############################################################################
 
-const REGEXES = YAML.load(open(Pkg.dir("UAParser", "regexes.yaml")));
+const REGEXES = YAML.load(open(joinpath(dirname(@__FILE__), "..", "regexes.yaml")));
 
 ##############################################################################
 ##
