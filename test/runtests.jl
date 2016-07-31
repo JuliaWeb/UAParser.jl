@@ -7,14 +7,14 @@ using UAParser, YAML, Base.Test
 
 
 #Test 1: Validation of parsedevice
-test_device = YAML.load(open(Pkg.dir("UAParser", "test", "data", "test_device.yaml")));
+test_device = YAML.load(open(joinpath(dirname(@__FILE__), "data", "test_device.yaml")));
 
 for test_case in test_device["test_cases"]
   @test test_case["family"] == parsedevice(test_case["user_agent_string"]).family
 end
 
 #Test 2: Validation of parseos
-test_os = YAML.load(open(Pkg.dir("UAParser", "test", "data", "test_user_agent_parser_os.yaml")));
+test_os = YAML.load(open(joinpath(dirname(@__FILE__), "data", "test_user_agent_parser_os.yaml")));
 
 for value in test_os["test_cases"]
   @test Dict{Any, Any}("major" => value["major"],
@@ -30,7 +30,7 @@ for value in test_os["test_cases"]
 end
 
 #Test 3: Additional validation of parseos
-test_os_2 = YAML.load(open(Pkg.dir("UAParser", "test", "data", "additional_os_tests.yaml")));
+test_os_2 = YAML.load(open(joinpath(dirname(@__FILE__), "data", "additional_os_tests.yaml")));
 
 for value in test_os_2["test_cases"]
 @test Dict{Any, Any}("major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "patch_minor" => value["patch_minor"], "family" => value["family"]) ==
@@ -42,7 +42,7 @@ for value in test_os_2["test_cases"]
 end
 
 #Test 4: Validation of parseuseragent
-test_ua = YAML.load(open(Pkg.dir("UAParser", "test", "data", "test_user_agent_parser.yaml")));
+test_ua = YAML.load(open(joinpath(dirname(@__FILE__), "data", "test_user_agent_parser.yaml")));
 
 for value in test_ua["test_cases"]
 @test Dict{Any, Any}("major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "family" => value["family"]) ==
@@ -53,7 +53,7 @@ for value in test_ua["test_cases"]
 end
 
 #Test 5: Additional validation of parseuseragent
-test_ua_2 = YAML.load(open(Pkg.dir("UAParser", "test", "data", "firefox_user_agent_strings.yaml")));
+test_ua_2 = YAML.load(open(joinpath(dirname(@__FILE__), "data", "firefox_user_agent_strings.yaml")));
 
 for value in test_ua_2["test_cases"]
 @test Dict{Any, Any}("major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "family" => value["family"]) ==
