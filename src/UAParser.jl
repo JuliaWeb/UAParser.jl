@@ -1,4 +1,4 @@
-VERSION >= v"0.4-" && __precompile__()
+__precompile__(true)
 module UAParser
 
 export parsedevice, parseuseragent, parseos, DeviceResult, OSResult, UAResult, DataFrame
@@ -27,23 +27,50 @@ const REGEXES = YAML.load(open(joinpath(dirname(@__FILE__), "..", "regexes.yaml"
 ##
 ##############################################################################
 
-immutable UserAgentParser
-  user_agent_re::Regex
-  family_replacement::Union{AbstractString, Void}
-  v1_replacement::Union{AbstractString, Void}
-  v2_replacement::Union{AbstractString, Void}
+# helper function used by constructors
+_check_void_string(s::AbstractString) = String(s)
+_check_void_string(::Void) = nothing
+
+struct UserAgentParser
+    user_agent_re::Regex
+    family_replacement::Union{String, Void}
+    v1_replacement::Union{String, Void}
+    v2_replacement::Union{String, Void}
+
+    function UserAgentParser(user_agent_re::Regex, family_replacement::Union{AbstractString, Void},
+                             v1_replacement::Union{AbstractString, Void},
+                             v2_replacement::Union{AbstractString, Void})
+        new(user_agent_re, _check_void_string(family_replacement),
+            _check_void_string(v1_replacement), _check_void_string(v2_replacement))
+    end
 end
 
-immutable OSParser
-  user_agent_re::Regex
-  os_replacement::Union{AbstractString, Void}
-  os_v1_replacement::Union{AbstractString, Void}
-  os_v2_replacement::Union{AbstractString, Void}
+struct OSParser
+    user_agent_re::Regex
+    os_replacement::Union{String, Void}
+    os_v1_replacement::Union{String, Void}
+    os_v2_replacement::Union{String, Void}
+
+    function OSParser(user_agent_re::Regex, os_replacement::Union{AbstractString, Void},
+                      os_v1_replacement::Union{AbstractString, Void},
+                      os_v2_replacement::Union{AbstractString, Void})
+        new(user_agent_re, _check_void_string(os_replacement), _check_void_string(os_v1_replacement),
+            _check_void_string(os_v2_replacement))
+    end
 end
 
-immutable DeviceParser
-  user_agent_re::Regex
-  device_replacement::Union{AbstractString, Void}
+struct DeviceParser
+    user_agent_re::Regex
+    device_replacement::Union{String, Void}
+    brand_replacement::Union{String, Void}
+    model_replacement::Union{String, Void}
+
+    function DeviceParser(user_agent_re::Regex, device_replacement::Union{AbstractString, Void},
+                          brand_replacement::Union{AbstractString, Void},
+                          model_replacement::Union{AbstractString, Void})
+        new(user_agent_re, _check_void_string(device_replacement),
+            _check_void_string(brand_replacement), _check_void_string(model_replacement))
+    end
 end
 
 ##############################################################################
@@ -52,23 +79,43 @@ end
 ##
 ##############################################################################
 
-immutable DeviceResult
-  family::UTF8String
+struct DeviceResult
+    family::String
+    brand::Union{String, Void}
+    model::Union{String, Void}
+
+    function DeviceResult(family::AbstractString, brand::Union{AbstractString, Void},
+                          model::Union{AbstractString, Void})
+        new(string(family), _check_void_string(brand), _check_void_string(model))
+    end
 end
 
-immutable UAResult
-  family::AbstractString
-  major::Union{AbstractString, Void}
-  minor::Union{AbstractString, Void}
-  patch::Union{AbstractString, Void}
+struct UAResult
+    family::String
+    major::Union{String, Void}
+    minor::Union{String, Void}
+    patch::Union{String, Void}
+
+    function UAResult(family::AbstractString, major::Union{AbstractString, Void},
+                      minor::Union{AbstractString, Void}, patch::Union{AbstractString, Void})
+        new(string(family), _check_void_string(major), _check_void_string(minor),
+            _check_void_string(patch))
+    end
 end
 
-immutable OSResult
-  family::AbstractString
-  major::Union{AbstractString, Void}
-  minor::Union{AbstractString, Void}
-  patch::Union{AbstractString, Void}
-  patch_minor::Union{AbstractString, Void}
+struct OSResult
+    family::String
+    major::Union{String, Void}
+    minor::Union{String, Void}
+    patch::Union{String, Void}
+    patch_minor::Union{String, Void}
+
+    function OSResult(family::AbstractString, major::Union{AbstractString, Void},
+                      minor::Union{AbstractString, Void}, patch::Union{AbstractString, Void},
+                      patch_minor::Union{AbstractString, Void})
+        new(string(family), _check_void_string(major), _check_void_string(minor),
+            _check_void_string(patch), _check_void_string(patch_minor))
+    end
 end
 
 ##############################################################################
@@ -94,7 +141,6 @@ function loadua()
                                   _v1_replacement,
                                   _v2_replacement
                                   ))
-
   end
   return temp
 end #End loadua
@@ -133,9 +179,12 @@ function loaddevice()
   for _device_parser in REGEXES["device_parsers"]
       _user_agent_re = Regex(_device_parser["regex"])
       _device_replacement = get(_device_parser, "device_replacement", nothing)
+      _brand_replacement = get(_device_parser, "brand_replacement", nothing)
+      _model_replacement = get(_device_parser, "model_replacement", nothing)
 
     #Add values to array
-      push!(temp, DeviceParser(_user_agent_re, _device_replacement))
+      push!(temp, DeviceParser(_user_agent_re, _device_replacement, _brand_replacement,
+                               _model_replacement))
   end
   return temp
 end #End loaddevice
@@ -148,28 +197,63 @@ const DEVICE_PARSERS = loaddevice()
 ##
 ##############################################################################
 
-function parsedevice(user_agent_string::AbstractString)
-  for value in DEVICE_PARSERS
-    if ismatch(value.user_agent_re, user_agent_string)
-      if value.device_replacement != nothing
-        if ismatch(r"\$1", value.device_replacement)
-          device = replace(value.device_replacement, "\$1", match(value.user_agent_re, user_agent_string).captures[1])
-        else
-          device = value.device_replacement
-        end
-      else
-        device = match(value.user_agent_re, user_agent_string).captures[1]
-      end
-
-        return DeviceResult(device)
+# helper function for parsedevice
+function _inner_replace(str::AbstractString, group)
+    # TODO this rather dangerously assumes that strings are $ followed by ints
+    idx = parse(Int, str[2:end])
+    if idx ≤ length(group) && group[idx] ≠ nothing
+        group[idx]
+    else
+        ""
     end
-  end
+end
 
-return DeviceResult("Other")  #Fail-safe for no match
-end #End parsedevice
+# helper function for parsedevice
+function _multireplace(str::AbstractString, mtch::RegexMatch)
+    _str = replace(str, r"\$(\d)", m -> _inner_replace(m, mtch.captures))
+    _str = replace(_str, r"^\s+|\s+$", "")
+    length(_str) == 0 ? nothing : _str
+end
 
-#Vectorize parsedevice for any array of user-agent strings
-Base.@vectorize_1arg AbstractString parsedevice
+
+function parsedevice(user_agent_string::AbstractString)
+    for value in DEVICE_PARSERS
+        if ismatch(value.user_agent_re, user_agent_string)
+
+            # TODO, this is probably really inefficient, should be one call with ismatch
+            _match = match(value.user_agent_re, user_agent_string)
+
+            # family
+            if value.device_replacement ≠ nothing
+                device = _multireplace(value.device_replacement, _match)
+            else
+                device = _match.captures[1]
+            end
+
+            # brand
+            if value.brand_replacement ≠ nothing
+                brand = _multireplace(value.brand_replacement, _match)
+            elseif length(_match.captures) > 1
+                brand = match_vals[2]
+            else
+                brand = nothing
+            end
+
+            # model
+            if value.model_replacement ≠ nothing
+                model = _multireplace(value.model_replacement, _match)
+            elseif length(_match.captures) > 2
+                model = match_vals[3]
+            else
+                model = nothing
+            end
+
+            return DeviceResult(device, brand, model)
+        end
+    end
+    DeviceResult("Other",nothing,nothing)  #Fail-safe for no match
+end # parsedevice
+
 
 function parseuseragent(user_agent_string::AbstractString)
   for value in USER_AGENT_PARSERS
@@ -221,8 +305,6 @@ function parseuseragent(user_agent_string::AbstractString)
 return UAResult("Other", nothing, nothing, nothing) #Fail-safe for no match
 end #End parseuseragent
 
-#Vectorize parseuseragent for any array of user-agent strings
-Base.@vectorize_1arg AbstractString parseuseragent
 
 function parseos(user_agent_string::AbstractString)
     for value in OS_PARSERS
@@ -276,8 +358,6 @@ function parseos(user_agent_string::AbstractString)
 return OSResult("Other", nothing, nothing, nothing, nothing) #Fail-safe if no match
 end #End parseos
 
-#Vectorize parseos for any array of user-agent strings
-Base.@vectorize_1arg AbstractString parseos
 
 ##############################################################################
 ##
@@ -285,64 +365,71 @@ Base.@vectorize_1arg AbstractString parseos
 ##
 ##############################################################################
 
-#Convenience function to take nothing type to UTF8String of length 0
+#Convenience function to take nothing type to String of length 0
 #This is a hack for sure
-function nothing_to_utf8empty(x::Union{AbstractString, Void})
+function nothing_to_emptystr(x::Union{AbstractString, Void})
   if x == nothing
     x = ""
   else
-    x = convert(UTF8String, x)
+    x = convert(String, x)
   end
 end
 
 #DeviceResult to DataFrame method
 function DataFrame(x::Array{DeviceResult, 1})
-  temp = DataFrame([element.family for element in x])
-  names!(temp, ["device"])
-  return temp
+    temp = DataFrame(String, size(x, 1), 3)
+    names!(temp, ["device", "brand", "model"])
+
+    temp["device"] = String[ξ.family for ξ ∈ x]
+
+    temp["brand"] = String[nothing_to_emptystr(ξ.brand) for ξ ∈ x]
+
+    temp["model"] = String[nothing_to_emptystr(ξ.model) for ξ ∈ x]
+
+    temp
 end
 
 #OSResult to DataFrame method
 function DataFrame(x::Array{OSResult, 1})
-  #Pre-allocate size of DataFrame based on array passed in
-  temp = DataFrame(UTF8String, size(x, 1), 5)
-  names!(temp, ["os_family", "os_major", "os_minor", "os_patch", "os_patch_minor"])
+    #Pre-allocate size of DataFrame based on array passed in
+    temp = DataFrame(String, size(x, 1), 5)
+    names!(temp, ["os_family", "os_major", "os_minor", "os_patch", "os_patch_minor"])
 
-  #Family - Can use comprehension since family always UTF8String
-  temp["os_family"] = UTF8String[element.family for element in x]
+    #Family - Can use comprehension since family always String
+    temp["os_family"] = String[element.family for element in x]
 
-  #Major
-  temp["os_major"] = UTF8String[nothing_to_utf8empty(element.major) for element in x]
+    #Major
+    temp["os_major"] = String[nothing_to_emptystr(element.major) for element in x]
 
-  #Minor
-  temp["os_minor"] = UTF8String[nothing_to_utf8empty(element.minor) for element in x]
+    #Minor
+    temp["os_minor"] = String[nothing_to_emptystr(element.minor) for element in x]
 
-  #Patch
-  temp["os_patch"] = UTF8String[nothing_to_utf8empty(element.patch) for element in x]
+    #Patch
+    temp["os_patch"] = String[nothing_to_emptystr(element.patch) for element in x]
 
-  #Patch_Minor
-  temp["os_patch_minor"] = UTF8String[nothing_to_utf8empty(element.patch_minor) for element in x]
+    #Patch_Minor
+    temp["os_patch_minor"] = String[nothing_to_emptystr(element.patch_minor) for element in x]
 
-  return temp
+    temp
 end
 
 #UAResult to DataFrame method
 function DataFrame(x::Array{UAResult, 1})
   #Pre-allocate size of DataFrame based on array passed in
-  temp = DataFrame(UTF8String, size(x, 1), 4)
+  temp = DataFrame(String, size(x, 1), 4)
   names!(temp, ["browser_family", "browser_major", "browser_minor", "browser_patch"])
 
-  #Family - Can use comprehension since family always UTF8String
-  temp["browser_family"] = UTF8String[element.family for element in x]
+  #Family - Can use comprehension since family always String
+  temp["browser_family"] = String[element.family for element in x]
 
   #Major
-  temp["browser_major"] = UTF8String[nothing_to_utf8empty(element.major) for element in x]
+  temp["browser_major"] = String[nothing_to_emptystr(element.major) for element in x]
 
   #Minor
-  temp["browser_minor"] = UTF8String[nothing_to_utf8empty(element.minor) for element in x]
+  temp["browser_minor"] = String[nothing_to_emptystr(element.minor) for element in x]
 
   #Patch
-  temp["browser_patch"] = UTF8String[nothing_to_utf8empty(element.patch) for element in x]
+  temp["browser_patch"] = String[nothing_to_emptystr(element.patch) for element in x]
 
   return temp
 end

@@ -9,6 +9,7 @@ using UAParser, YAML, Base.Test
 #Test 1: Validation of parsedevice
 test_device = YAML.load(open(joinpath(dirname(@__FILE__), "data", "test_device.yaml")));
 
+
 for test_case in test_device["test_cases"]
   @test test_case["family"] == parsedevice(test_case["user_agent_string"]).family
 end
@@ -16,17 +17,19 @@ end
 #Test 2: Validation of parseos
 test_os = YAML.load(open(joinpath(dirname(@__FILE__), "data", "test_user_agent_parser_os.yaml")));
 
+val = nothing
+
 for value in test_os["test_cases"]
-  @test Dict{Any, Any}("major" => value["major"],
-      "minor" => value["minor"],
-      "patch" => value["patch"],
-      "patch_minor" => value["patch_minor"],
-      "family" => value["family"]) ==
-      Dict{Any, Any}("major" => parseos(value["user_agent_string"]).major,
-       "minor" => parseos(value["user_agent_string"]).minor,
-       "patch" => parseos(value["user_agent_string"]).patch,
-       "patch_minor" => parseos(value["user_agent_string"]).patch_minor,
-       "family" => parseos(value["user_agent_string"]).family)
+    @test Dict{Any, Any}("major" => value["major"],
+                         "minor" => value["minor"],
+                         "patch" => value["patch"],
+                         "patch_minor" => value["patch_minor"],
+                         "family" => value["family"]) ==
+          Dict{Any, Any}("major" => parseos(value["user_agent_string"]).major,
+                         "minor" => parseos(value["user_agent_string"]).minor,
+                         "patch" => parseos(value["user_agent_string"]).patch,
+                         "patch_minor" => parseos(value["user_agent_string"]).patch_minor,
+                         "family" => parseos(value["user_agent_string"]).family)
 end
 
 #Test 3: Additional validation of parseos
@@ -45,6 +48,8 @@ end
 test_ua = YAML.load(open(joinpath(dirname(@__FILE__), "data", "test_user_agent_parser.yaml")));
 
 for value in test_ua["test_cases"]
+    val = value
+    println(value["user_agent_string"])
 @test Dict{Any, Any}("major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "family" => value["family"]) ==
     Dict{Any, Any}("major" => parseuseragent(value["user_agent_string"]).major,
      "minor" => parseuseragent(value["user_agent_string"]).minor,

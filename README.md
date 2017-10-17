@@ -12,6 +12,8 @@ UAParser is a Julia port of [ua-parser](https://github.com/tobie/ua-parser), whi
 
 UAParser is a limited Julia implementation heavily influenced by the [Python code](https://github.com/tobie/ua-parser/tree/master/py) from the ua-parser library.
 
+**Note:** that the new regexes have were retrieved from [here](https://github.com/ua-parser/uap-core/blob/master/regexes.yaml).
+
 ##UAParser API
 
 The API for UAParser revolves around three functions: `parsedevice`, `parseos` and `parseuseragent`. Each function takes one argument, `user_agent_string::AbstractString` and returns a custom Julia type: `DeviceResult`, `OSResult`, or `UAResult`. The structure of each type is as follows:
