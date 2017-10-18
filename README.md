@@ -17,7 +17,7 @@ performant than the Python version because that code spent a significant amount 
 **Note:** the new regexes have were retrieved from [here](https://github.com/ua-parser/uap-core/blob/master/regexes.yaml).  This seemed to me the most up to
 date source I could find at the time.
 
-##UAParser API
+## UAParser API
 
 The API for UAParser revolves around three functions: `parsedevice`, `parseos` and `parseuseragent`. Each function takes one argument, `user_agent_string::AbstractString` and returns a custom Julia type: `DeviceResult`, `OSResult`, or `UAResult`. The structure of each type is as follows:
 
@@ -30,7 +30,7 @@ The API for UAParser revolves around three functions: `parsedevice`, `parseos` a
 
 ```
 
-##Code examples
+## Code examples
 
 ```julia
   using UAParser
@@ -64,6 +64,6 @@ You can index into the results of these functions like any other Julia composite
 
 Each function is vectorized using `Base.@vectorize_1arg`, so passing an array of user-agent strings will return an array. Finally, DataFrame methods have been defined for arrays of each UAParser type, so calling `DataFrame(DeviceResult)` will transform the array to a DataFrame.
 
-##Licensing
+## Licensing
 
 The licensing of the UAParser Julia module is under the [default MIT Expat license](https://github.com/JuliaWeb/UAParser.jl/blob/master/LICENSE.md).
