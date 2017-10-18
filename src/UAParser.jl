@@ -363,7 +363,7 @@ parseos(::Null) = null
 ##############################################################################
 
 #DeviceResult to DataFrame method
-function DataFrame(x::Array{DeviceResult, 1})
+function DataFrame(x::AbstractVector{DeviceResult})
     temp = DataFrame()
 
     temp["device"] = String[element.family for element ∈ x]
@@ -376,7 +376,7 @@ function DataFrame(x::Array{DeviceResult, 1})
 end
 
 #OSResult to DataFrame method
-function DataFrame(x::Array{OSResult, 1})
+function DataFrame(x::AbstractVector{OSResult})
     temp = DataFrame()
 
     #Family - Can use comprehension since family always String
@@ -398,7 +398,7 @@ function DataFrame(x::Array{OSResult, 1})
 end
 
 #UAResult to DataFrame method
-function DataFrame(x::Array{UAResult, 1})
+function DataFrame(x::AbstractVector{UAResult})
   #Pre-allocate size of DataFrame based on array passed in
   temp = DataFrame()
 
@@ -414,7 +414,7 @@ function DataFrame(x::Array{UAResult, 1})
   #Patch
   temp["browser_patch"] = Union{String,Null}[element.patch for element in x]
 
-  return temp
+  temp
 end
 
 end # module
