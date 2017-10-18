@@ -409,7 +409,7 @@ function DataFrame(x::Array{UAResult, 1})
   temp["browser_major"] = Union{String,Null}[element.major for element in x]
 
   #Minor
-  temp["browser_minor"] = Union{String,Nul}[element.minor for element in x]
+  temp["browser_minor"] = Union{String,Null}[element.minor for element in x]
 
   #Patch
   temp["browser_patch"] = Union{String,Null}[element.patch for element in x]
