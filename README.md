@@ -21,13 +21,12 @@ date source I could find at the time.
 
 The API for UAParser revolves around three functions: `parsedevice`, `parseos` and `parseuseragent`. Each function takes one argument, `user_agent_string::AbstractString` and returns a custom Julia type: `DeviceResult`, `OSResult`, or `UAResult`. The structure of each type is as follows:
 
-```julia
-  DeviceResult: family
+```
+  DeviceResult: family, brand, model
 
   UAResult: family, major, minor, patch
 
   OSResult: family, major, minor, patch, patch_minor
-
 ```
 
 ## Code examples
@@ -39,13 +38,13 @@ The API for UAParser revolves around three functions: `parsedevice`, `parseos` a
   user_agent_string = "Mozilla/5.0 (iPhone; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B179 Safari/7534.48.3"
 
   #Get device from user-agent string
-  parsedevice(user_agent_string) #=> DeviceResult("iPhone")
+  parsedevice(user_agent_string) #> DeviceResult("iPhone", "Apple", "iPhone")
 
   #Get browser information from user-agent string
-  parseuseragent(user_agent_string) #=> UAResult("Mobile Safari","5","1",nothing)
+  parseuseragent(user_agent_string) #> UAResult("Mobile Safari","5","1",nothing)
 
   #Get os information
-  parseos(user_agent_string) #=> OSResult("iOS","5","1",nothing,nothing)
+  parseos(user_agent_string) #> OSResult("iOS","5","1",nothing,nothing)
 
 ```
 
@@ -54,12 +53,11 @@ You can index into the results of these functions like any other Julia composite
 ```julia
   #Get just browser information, no version information
   x1 = parseuseragent(user_agent_string)
-  x1.family #=> "Mobile Safari"
+  x1.family #> "Mobile Safari"
 
   #Get the os, no version information
   x2 = parseos(user_agent_string)
-  x2.family #=> "iOS"
-
+  x2.family #> "iOS"
 ```
 
 Each function is vectorized using `Base.@vectorize_1arg`, so passing an array of user-agent strings will return an array. Finally, DataFrame methods have been defined for arrays of each UAParser type, so calling `DataFrame(DeviceResult)` will transform the array to a DataFrame.
