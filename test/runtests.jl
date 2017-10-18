@@ -17,8 +17,6 @@ end
 #Test 2: Validation of parseos
 test_os = YAML.load(open(joinpath(dirname(@__FILE__), "data", "test_user_agent_parser_os.yaml")));
 
-val = nothing
-
 for value in test_os["test_cases"]
     @test Dict{Any, Any}("major" => value["major"],
                          "minor" => value["minor"],
@@ -48,8 +46,6 @@ end
 test_ua = YAML.load(open(joinpath(dirname(@__FILE__), "data", "test_user_agent_parser.yaml")));
 
 for value in test_ua["test_cases"]
-    val = value
-    println(value["user_agent_string"])
 @test Dict{Any, Any}("major" => value["major"], "minor" => value["minor"], "patch" => value["patch"], "family" => value["family"]) ==
     Dict{Any, Any}("major" => parseuseragent(value["user_agent_string"]).major,
      "minor" => parseuseragent(value["user_agent_string"]).minor,

@@ -10,9 +10,12 @@ UAParser is a Julia port of [ua-parser](https://github.com/tobie/ua-parser), whi
 
 > "The crux of the original parser--the data collected by [Steve Souders](http://stevesouders.com/) over the years--has been extracted into a separate [YAML file](https://github.com/tobie/ua-parser/blob/master/regexes.yaml) so as to be reusable _as is_ by implementations in other programming languages."
 
-UAParser is a limited Julia implementation heavily influenced by the [Python code](https://github.com/tobie/ua-parser/tree/master/py) from the ua-parser library.
+UAParser is a limited Julia implementation heavily influenced by the [Python code](https://github.com/tobie/ua-parser/tree/master/py) from the ua-parser
+library.  Ideally the code would be rewritten to be more performant and Julian, but right now this is not a priority.  This should already be much more
+performant than the Python version because that code spent a significant amount of time in Python (rather than just in the regex library).
 
-**Note:** that the new regexes have were retrieved from [here](https://github.com/ua-parser/uap-core/blob/master/regexes.yaml).
+**Note:** the new regexes have were retrieved from [here](https://github.com/ua-parser/uap-core/blob/master/regexes.yaml).  This seemed to me the most up to
+date source I could find at the time.
 
 ##UAParser API
 
@@ -63,4 +66,4 @@ Each function is vectorized using `Base.@vectorize_1arg`, so passing an array of
 
 ##Licensing
 
-The data contained in regexes.yaml is Copyright 2009 Google Inc. and available under the Apache License, Version 2.0. The licensing of the UAParser Julia module is under the [default MIT Expat license](https://github.com/JuliaWeb/UAParser.jl/blob/master/LICENSE.md).
+The licensing of the UAParser Julia module is under the [default MIT Expat license](https://github.com/JuliaWeb/UAParser.jl/blob/master/LICENSE.md).

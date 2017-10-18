@@ -608,7 +608,7 @@ test_cases:
     family: 'Opera Mini'
     major: '5'
     minor: '1'
-    patch:
+    patch: '191'
 
   - user_agent_string: 'Opera/9.80 (Series 60; Opera Mini/6.24455/25.677; U; fr) Presto/2.5.25 Version/10.54'
     family: 'Opera Mini'
@@ -620,7 +620,7 @@ test_cases:
     family: 'Opera Mini'
     major: '7'
     minor: '0'
-    patch:
+    patch: '31437'
 
   - user_agent_string: 'Opera/9.80 (S60; SymbOS; Opera Mobi/275; U; es-ES) Presto/2.4.13 Version/10.00'
     family: 'Opera Mobile'
@@ -683,7 +683,7 @@ test_cases:
     patch: '2'
 
   - user_agent_string: 'Mozilla/5.0 (Windows NT 5.1; rv:2.0) Gecko/20110407 Firefox/4.0.3 PaleMoon/4.0.3'
-    family: 'Pale Moon (Firefox Variant)'
+    family: 'Pale Moon'
     major: '4'
     minor: '0'
     patch: '3'
@@ -779,10 +779,10 @@ test_cases:
     patch: '5'
 
   - user_agent_string: 'Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Thunderbird/24.2.0 Lightning/2.6.4'
-    family: 'Lightning'
-    major: '2'
-    minor: '6'
-    patch: '4'
+    family: 'Thunderbird'
+    major: '24'
+    minor: '2'
+    patch: '0'
 
   - user_agent_string: 'Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Thunderbird/24.2.0'
     family: 'Thunderbird'
@@ -809,7 +809,7 @@ test_cases:
     patch:
 
   - user_agent_string: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/536.26.14 (KHTML, like Gecko)'
-    family: 'AppleMail'
+    family: 'Apple Mail'
     major: '536'
     minor: '26'
     patch: '14'
@@ -1086,14 +1086,14 @@ test_cases:
     family: 'Opera Mini'
     major: '4'
     minor: '2'
-    patch:
+    patch: '14812'
     patch_minor:
 
   - user_agent_string: 'SAMSUNG-SGH-A897/A897UCJC1; Mozilla/5.0 (Profile/MIDP-2.0 Configuration/CLDC-1.1; Opera Mini/att/4.2.15304; U; fr-US) Opera 9.50'
     family: 'Opera Mini'
     major: '4'
     minor: '2'
-    patch:
+    patch: '15304'
     patch_minor:
 
   - user_agent_string: 'MQQBrowser/39 Mozilla/5.0 (iPhone 4S; CPU iPhone OS 6_0_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Mobile/10A523 Safari/7534.48.3'
@@ -1230,162 +1230,29 @@ test_cases:
     patch_minor:
 
   - user_agent_string: 'Safari/6533.18.5 CFNetwork/454.9.8 Darwin/10.4.0 (i386) (MacBookPro7,1)'
-    family: 'CFNetwork'
-    major: '454'
-    minor: '9'
-    patch: '8'
+    family: 'Safari'
+    major: '6533'
+    minor: '18'
+    patch: '5'
     patch_minor:
 
   - user_agent_string: 'Safari/7536.30.1 CFNetwork/520.5.1 Darwin/11.4.2 (i386) (MacBook3,1)'
-    family: 'CFNetwork'
-    major: '520'
-    minor: '5'
+    family: 'Safari'
+    major: '7536'
+    minor: '30'
     patch: '1'
     patch_minor:
 
   - user_agent_string: 'Reader Notifier/5 CFNetwork/596.3.3 Darwin/12.3.0 (x86_64) (MacBookPro7,1)'
-    family: 'CFNetwork'
-    major: '596'
-    minor: '3'
-    patch: '3'
+    family: 'Reader Notifier'
+    major: '5'
+    minor:
+    patch:
     patch_minor:
 
   - user_agent_string: 'Safari/9537.71 CFNetwork/673.0.2 Darwin/13.0.1 (x86_64) (MacBookPro11,1)'
-    family: 'CFNetwork'
-    major: '673'
-    minor: '0'
-    patch: '2'
-    patch_minor:
-
-  - user_agent_string: 'DEPoker-iPad/1.0.2 CFNetwork/548.1.4 Darwin/11.0.0'
-    family: 'CFNetwork'
-    major: '548'
-    minor: '1'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'JDSports-iPad/1.1 CFNetwork/672.0.8 Darwin/14.0.0'
-    family: 'CFNetwork'
-    major: '672'
-    minor: '0'
-    patch: '8'
-    patch_minor:
-
-  - user_agent_string: 'AngryBirdsBlack-iPhone/1.1.0 CFNetwork/548.1.4 Darwin/11.0.0'
-    family: 'CFNetwork'
-    major: '548'
-    minor: '1'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'Bing for iPad/1.1.2 CFNetwork/485.13.9 Darwin/11.0.0'
-    family: 'CFNetwork'
-    major: '485'
-    minor: '13'
-    patch: '9'
-    patch_minor:
-
-  - user_agent_string: 'NightstandPaid-iPad/1.3.1 CFNetwork/548.1.4 Darwin/11.0.0'
-    family: 'CFNetwork'
-    major: '548'
-    minor: '1'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'Glo-De-iPad/1.4.7 CFNetwork/672.0.2 Darwin/14.0.0'
-    family: 'CFNetwork'
-    major: '672'
-    minor: '0'
-    patch: '2'
-    patch_minor:
-
-  - user_agent_string: 'Island for iPhone/1.95 CFNetwork/672.0.2 Darwin/14.0.0'
-    family: 'CFNetwork'
-    major: '672'
-    minor: '0'
-    patch: '2'
-    patch_minor:
-
-  - user_agent_string: 'WormsiPhone-iPad/2.3 CFNetwork/548.1.4 Darwin/11.0.0'
-    family: 'CFNetwork'
-    major: '548'
-    minor: '1'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'Rummy LITE iPad/2.3.0 CFNetwork/609.1.4 Darwin/13.0.0'
-    family: 'CFNetwork'
-    major: '609'
-    minor: '1'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'MobileRSSFree-iPad/3.1 CFNetwork/467.12 Darwin/10.3.1'
-    family: 'CFNetwork'
-    major: '467'
-    minor: '12'
+    family: 'Safari'
+    major: '9537'
+    minor: '71'
     patch:
-    patch_minor:
-
-  - user_agent_string: 'MobileRSSFree-iPad/3.1.4 CFNetwork/485.13.9 Darwin/11.0.0'
-    family: 'CFNetwork'
-    major: '485'
-    minor: '13'
-    patch: '9'
-    patch_minor:
-
-  - user_agent_string: 'babbelIndonesian-iPad/4.0.1 CFNetwork/672.0.8 Darwin/14.0.0'
-    family: 'CFNetwork'
-    major: '672'
-    minor: '0'
-    patch: '8'
-    patch_minor:
-
-  - user_agent_string: 'WeltMobile-iPad/4.2 CFNetwork/609.1.4 Darwin/13.0.0'
-    family: 'CFNetwork'
-    major: '609'
-    minor: '1'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'IMPlusFull-iPad/7.9.1 CFNetwork/548.0.4 Darwin/11.0.0'
-    family: 'CFNetwork'
-    major: '548'
-    minor: '0'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'Cooliris/1.3 CFNetwork/342.1 Darwin/9.4.1'
-    family: 'CFNetwork'
-    major: '342'
-    minor: '1'
-    patch:
-    patch_minor:
-
-  - user_agent_string: 'Poof/1.0 CFNetwork/485.12.7 Darwin/10.4.0'
-    family: 'CFNetwork'
-    major: '485'
-    minor: '12'
-    patch: '7'
-    patch_minor:
-
-  - user_agent_string: 'Parking Mania Free/1.9.5.0 CFNetwork/548.0.4 Darwin/11.0.0'
-    family: 'CFNetwork'
-    major: '548'
-    minor: '0'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'Planet Boing!/1.4.8 CFNetwork/609.1.4 Darwin/13.0.0'
-    family: 'CFNetwork'
-    major: '609'
-    minor: '1'
-    patch: '4'
-    patch_minor:
-
-  - user_agent_string: 'PlayTube/1.7 CFNetwork/672.0.2 Darwin/14.0.0'
-    family: 'CFNetwork'
-    major: '672'
-    minor: '0'
-    patch: '2'
     patch_minor:
