@@ -366,11 +366,11 @@ parseos(::Null) = null
 function DataFrame(x::AbstractVector{DeviceResult})
     temp = DataFrame()
 
-    temp["device"] = String[element.family for element ∈ x]
+    temp["device"] = String[element.family for element in x]
 
-    temp["brand"] = Union{String,Null}[element.brand for element ∈ x]
+    temp["brand"] = Union{String,Null}[element.brand for element in x]
 
-    temp["model"] = Union{String,Null}[element.model for element ∈ x]
+    temp["model"] = Union{String,Null}[element.model for element in x]
 
     temp
 end

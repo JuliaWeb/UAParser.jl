@@ -1,15 +1,26 @@
 language: julia
+
+julia:
+  - 0.6
+  - nightly
+
 os:
   - linux
   - osx
-julia:
-  - 0.4
-  - 0.5
-  - nightly
+
+matrix:
+ allow_failures:
+ - julia: nightly
+
 notifications:
   email: false
+
+before_script:
+  - export PATH=$HOME/.local/bin:$PATH
+
 script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia -e 'Pkg.clone(pwd()); Pkg.test("UAParser"; coverage=true)'
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.build("UAParser"); Pkg.test("UAParser"; coverage=true)'
+
 after_success:
-  - julia -e 'cd(Pkg.dir("UAParser")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
+  - julia -e 'cd(Pkg.dir("UAParser")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
