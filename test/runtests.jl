@@ -1,4 +1,4 @@
-using UAParser, YAML, Base.Test
+using UAParser, YAML, Missings, Base.Test
 
 #These user-agents look to be older, may not still be out in wild
 
@@ -8,7 +8,7 @@ macro testparseval(obj::Symbol, valname::String, outputname::Symbol)
     valsymb = Symbol(valname)
     esc(quote
         if $obj[$valname] == nothing
-            @test isnull($outputname.$valsymb)
+            @test ismissing($outputname.$valsymb)
         else
             @test $obj[$valname] == $outputname.$valsymb
         end
