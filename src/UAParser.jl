@@ -1,4 +1,3 @@
-__precompile__(true)
 module UAParser
 
 export parsedevice, parseuseragent, parseos, DeviceResult, OSResult, UAResult, DataFrame
@@ -10,7 +9,7 @@ export parsedevice, parseuseragent, parseos, DeviceResult, OSResult, UAResult, D
 ##
 ##############################################################################
 
-using YAML, DataFrames, Missings
+using YAML, DataFrames
 import DataFrames.DataFrame, DataFrames.names!
 
 ##############################################################################
@@ -30,7 +29,7 @@ const REGEXES = YAML.load(open(joinpath(dirname(@__FILE__), "..", "regexes.yaml"
 # helper function used by constructors
 _check_missing_string(s::AbstractString) = String(s)
 _check_missing_string(::Missing) = missing
-_check_missing_string(::Void) = missing
+_check_missing_string(::Nothing) = missing
 _check_missing_string(x) = ArgumentError("Invalid string or missing passed: $x")
 
 struct UserAgentParser
@@ -204,17 +203,17 @@ end
 
 # helper function for parsedevice
 function _multireplace(str::AbstractString, mtch::RegexMatch)
-    _str = replace(str, r"\$(\d)", m -> _inner_replace(m, mtch.captures))
-    _str = replace(_str, r"^\s+|\s+$", "")
+    _str = replace(str, r"\$(\d)" => m -> _inner_replace(m, mtch.captures))
+    _str = replace(_str, r"^\s+|\s+$" => "")
     length(_str) == 0 ? missing : _str
 end
 
 
 function parsedevice(user_agent_string::AbstractString)
     for value in DEVICE_PARSERS
-        if ismatch(value.user_agent_re, user_agent_string)
+        if occursin(value.user_agent_re, user_agent_string)
 
-            # TODO, this is probably really inefficient, should be one call with ismatch
+            # TODO, this is probably really inefficient, should be one call with occursin
             _match = match(value.user_agent_re, user_agent_string)
 
             # family
@@ -252,13 +251,13 @@ parsedevice(::Missing) = missing
 
 function parseuseragent(user_agent_string::AbstractString)
   for value in USER_AGENT_PARSERS
-    if ismatch(value.user_agent_re, user_agent_string)
+    if occursin(value.user_agent_re, user_agent_string)
 
       match_vals = match(value.user_agent_re, user_agent_string).captures
 
       #family
       if !ismissing(value.family_replacement)
-        if ismatch(r"\$1", value.family_replacement)
+        if occursin(r"\$1", value.family_replacement)
           family = replace(value.family_replacement, "\$1", match_vals[1])
         else
           family = value.family_replacement
@@ -304,7 +303,7 @@ parseuseragent(::Missing) = missing
 
 function parseos(user_agent_string::AbstractString)
     for value in OS_PARSERS
-        if ismatch(value.user_agent_re, user_agent_string)
+        if occursin(value.user_agent_re, user_agent_string)
             match_vals = match(value.user_agent_re, user_agent_string).captures
 
             #os
