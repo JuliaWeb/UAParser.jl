@@ -55,6 +55,20 @@ You can index into the results of these functions like any other Julia composite
   x2.family #> "iOS"
 ```
 
+## A Note On Parser Accuracy
+
+When this library was created, it became very obvious that it would be hard to replicate the Python parser code with 100% accuracy. The authors decided that a _reasonably accurate_ implementation was more useful than spending the time to achieve 100% accuracy.
+
+The tests in this library test against the accuracy of the parser. As of v0.6 of this package, here are the accuracy statistics against the files provided by the main ua-core project:
+
+```
+parse_device: 15144/16017 (94.6%)
+parse_os: 1517/1528 (99.3%)
+parse_ua: 204/205 (99.5%)
+```
+
+Of course, if someone would like to achieve 100% accuracy, PRs will absolutely be reviewed.
+
 ## Licensing
 
 The licensing of the UAParser Julia module is under the [default MIT Expat license](https://github.com/JuliaWeb/UAParser.jl/blob/master/LICENSE.md). The data
