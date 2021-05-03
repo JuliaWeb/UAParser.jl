@@ -10,7 +10,7 @@ export parsedevice, parseuseragent, parseos, DeviceResult, OSResult, UAResult, D
 ##############################################################################
 
 using YAML, DataFrames
-import DataFrames.DataFrame, DataFrames.names!
+import DataFrames.DataFrame
 
 ##############################################################################
 ##
@@ -27,7 +27,7 @@ const REGEXES = YAML.load(open(joinpath(dirname(@__FILE__), "..", "regexes.yaml"
 ##############################################################################
 
 # helper function used by constructors
-_check_missing_string(s::AbstractString) = String(s)
+_check_missing_string(s::AbstractString) = isempty(s) ? missing : String(s)
 _check_missing_string(::Missing) = missing
 _check_missing_string(::Nothing) = missing
 _check_missing_string(x) = ArgumentError("Invalid string or missing passed: $x")
@@ -117,13 +117,18 @@ end
 ##
 ##############################################################################
 
+"Compile the regex with flagss"
+function _load_regex_and_flags(yaml_data)
+    Regex(yaml_data["regex"], get(yaml_data, "regex_flag", ""))
+end
+
 function loadua()
   #Create empty array to hold user-agent information
   temp = []
 
   #Loop over entire set of user_agent_parsers, add to USER_AGENT_PARSERS
   for _ua_parser in REGEXES["user_agent_parsers"]
-      _user_agent_re = Regex(_ua_parser["regex"])
+      _user_agent_re = _load_regex_and_flags(_ua_parser)
       _family_replacement = get(_ua_parser, "family_replacement", missing)
       _v1_replacement = get(_ua_parser, "v1_replacement", missing)
       _v2_replacement = get(_ua_parser, "v2_replacement", missing)
@@ -146,7 +151,7 @@ function loados()
 
   #Loop over entire set of os_parsers, add to OS_PARSERS
   for _os_parser in REGEXES["os_parsers"]
-    _user_agent_re = Regex(_os_parser["regex"])
+    _user_agent_re = _load_regex_and_flags(_os_parser)
     _os_replacement = get(_os_parser, "os_replacement", missing)
     _os_v1_replacement = get(_os_parser, "os_v1_replacement", missing)
     _os_v2_replacement = get(_os_parser, "os_v2_replacement", missing)
@@ -170,7 +175,7 @@ function loaddevice()
 
   #Loop over entire set of device_parsers, add to DEVICE_PARSERS
   for _device_parser in REGEXES["device_parsers"]
-      _user_agent_re = Regex(_device_parser["regex"])
+      _user_agent_re = _load_regex_and_flags(_device_parser)
       _device_replacement = get(_device_parser, "device_replacement", missing)
       _brand_replacement = get(_device_parser, "brand_replacement", missing)
       _model_replacement = get(_device_parser, "model_replacement", missing)
@@ -211,10 +216,8 @@ end
 
 function parsedevice(user_agent_string::AbstractString)
     for value in DEVICE_PARSERS
-        if occursin(value.user_agent_re, user_agent_string)
-
-            # TODO, this is probably really inefficient, should be one call with occursin
-            _match = match(value.user_agent_re, user_agent_string)
+        _match = match(value.user_agent_re, user_agent_string)
+        if !isnothing(_match)
 
             # family
             if !ismissing(value.device_replacement)
@@ -251,24 +254,21 @@ parsedevice(::Missing) = missing
 
 function parseuseragent(user_agent_string::AbstractString)
   for value in USER_AGENT_PARSERS
-    if occursin(value.user_agent_re, user_agent_string)
+    _match = match(value.user_agent_re, user_agent_string)
+    if !isnothing(_match)
 
-      match_vals = match(value.user_agent_re, user_agent_string).captures
+      match_vals = _match.captures
 
       #family
       if !ismissing(value.family_replacement)
-        if occursin(r"\$1", value.family_replacement)
-          family = replace(value.family_replacement, "\$1", match_vals[1])
-        else
-          family = value.family_replacement
-        end
+        family = _multireplace(value.family_replacement, _match)
       else
         family = match_vals[1]
       end
 
       #major
       if !ismissing(value.v1_replacement)
-        v1 = value.v1_replacement
+        v1 = _multireplace(value.v1_replacement, _match)
       elseif length(match_vals) > 1
         v1 = match_vals[2]
       else
@@ -277,7 +277,7 @@ function parseuseragent(user_agent_string::AbstractString)
 
       #minor
       if !ismissing(value.v2_replacement)
-        v2 = value.v2_replacement
+        v2 = _multireplace(value.v2_replacement, _match)
       elseif length(match_vals) > 2
         v2 = match_vals[3]
       else
@@ -303,19 +303,20 @@ parseuseragent(::Missing) = missing
 
 function parseos(user_agent_string::AbstractString)
     for value in OS_PARSERS
-        if occursin(value.user_agent_re, user_agent_string)
-            match_vals = match(value.user_agent_re, user_agent_string).captures
+        _match = match(value.user_agent_re, user_agent_string)
+        if !isnothing(_match)
+            match_vals = _match.captures
 
             #os
             if !ismissing(value.os_replacement)
-                os = value.os_replacement
+                os = _multireplace(value.os_replacement, _match)
             else
                 os = match_vals[1]
             end
 
             #os_v1
             if !ismissing(value.os_v1_replacement)
-                os_v1 = value.os_v1_replacement
+                os_v1 = _multireplace(value.os_v1_replacement, _match)
             elseif length(match_vals) > 1
                 os_v1 = match_vals[2]
             else
@@ -324,7 +325,7 @@ function parseos(user_agent_string::AbstractString)
 
             #os_v2
             if !ismissing(value.os_v2_replacement)
-                os_v2 = value.os_v2_replacement
+                os_v2 = _multireplace(value.os_v2_replacement, _match)
             elseif length(match_vals) > 2
                 os_v2 = match_vals[3]
             else

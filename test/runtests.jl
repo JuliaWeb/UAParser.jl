@@ -23,10 +23,14 @@ end
     pass = 0
     fail = 0
     for test_case in test_device["test_cases"]
-        test_case["family"] == parsedevice(test_case["user_agent_string"]).family ? pass += 1 : fail += 1
+        old_fail = fail
+        str = test_case["user_agent_string"]
+        dev = parsedevice(str)
+        test_case["family"] == dev.family ? pass += 1 : fail += 1
+        fail == old_fail || @info """When parsing device for "$str", expect $test_case, but got $dev"""
     end
 
-    @test pass/(pass + fail) >= .945
+    @test pass/(pass + fail) >= 0.999
 
 end
 
@@ -37,15 +41,18 @@ end
     pass = 0
     fail = 0
 
-    for value in test_os["test_cases"]
-        os = parseos(value["user_agent_string"])
-        value["family"] == os.family ? pass += 1 : fail += 1
-        (@testparseval value "major" os) ? pass += 1 : fail += 1
-        (@testparseval value "minor" os) ? pass += 1 : fail += 1
-        (@testparseval value "patch_minor" os) ? pass += 1 : fail += 1
+    for test_case in test_os["test_cases"]
+        old_fail = fail
+        str = test_case["user_agent_string"]
+        os = parseos(str)
+        test_case["family"] == os.family ? pass += 1 : fail += 1
+        (@testparseval test_case "major" os) ? pass += 1 : fail += 1
+        (@testparseval test_case "minor" os) ? pass += 1 : fail += 1
+        (@testparseval test_case "patch_minor" os) ? pass += 1 : fail += 1
+        fail == old_fail || @info """When parsing os for "$str", expect $test_case, but got $os"""
     end
 
-    @test pass/(pass + fail) >= .992
+    @test pass/(pass + fail) >= 0.999
 
 end
 
@@ -56,14 +63,17 @@ end
     pass = 0
     fail = 0
 
-    for value in test_ua["test_cases"]
-        ua = parseuseragent(value["user_agent_string"])
-        value["family"] == ua.family ? pass += 1 : fail += 1
-        (@testparseval value "major" ua) ? pass += 1 : fail += 1
-        (@testparseval value "minor" ua) ? pass += 1 : fail += 1
-        (@testparseval value "patch" ua) ? pass += 1 : fail += 1
+    for test_case in test_ua["test_cases"]
+        old_fail = fail
+        str = test_case["user_agent_string"]
+        ua = parseuseragent(str)
+        test_case["family"] == ua.family ? pass += 1 : fail += 1
+        (@testparseval test_case "major" ua) ? pass += 1 : fail += 1
+        (@testparseval test_case "minor" ua) ? pass += 1 : fail += 1
+        (@testparseval test_case "patch" ua) ? pass += 1 : fail += 1
+        fail == old_fail || @info """When parsing ua for "$str", expect $test_case, but got $ua"""
     end
 
-    @test pass/(pass + fail) >= .992
+    @test pass/(pass + fail) >= 0.999
 
 end
