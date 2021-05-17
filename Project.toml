@@ -1,7 +1,7 @@
 name = "UAParser"
 uuid = "837028c2-ff35-4e48-8e90-1cf91023c992"
 authors = ["melonedo <44501064+melonedo@users.noreply.github.com>"]
-version = "0.7.0"
+version = "0.8.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
