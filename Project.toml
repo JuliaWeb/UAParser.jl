@@ -5,3 +5,6 @@ version = "0.7.0"
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
+
+[compat]
+julia = "1.0"
