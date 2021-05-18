@@ -1,6 +1,5 @@
 name = "UAParser"
-uuid = "837028c2-ff35-4e48-8e90-1cf91023c992"
-authors = ["melonedo <44501064+melonedo@users.noreply.github.com>"]
+uuid = "9c2e70fb-c67a-5ec7-8d93-51b38135a8ac"
 version = "0.8.0"
 
 [deps]
